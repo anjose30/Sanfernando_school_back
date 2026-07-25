@@ -2,7 +2,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from .models.categoria import Categoria
 from .models.noticia import Noticia
 from .models.galeriaCategoria import GaleriaCategoria
@@ -18,13 +18,13 @@ from django.contrib.auth.models import User
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
     serializer_class = CategoriaSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]  # GET público, resto con auth
 
 class NoticiaViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]  # GET público, resto con auth
     
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.request.user and self.request.user.is_staff:
             return Noticia.objects.all()
         return Noticia.objects.filter(publicado=True)
     
@@ -80,12 +80,12 @@ class NoticiaViewSet(viewsets.ModelViewSet):
 class GaleriaCategoriaViewSet(viewsets.ModelViewSet):
     queryset = GaleriaCategoria.objects.all()
     serializer_class = GaleriaCategoriaSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]  # GET público, resto con auth
 
 class ImagenGaleriaViewSet(viewsets.ModelViewSet):
     queryset = ImagenGaleria.objects.filter(activo=True)
     serializer_class = ImagenGaleriaSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly]  # GET público, resto con auth
     
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -95,6 +95,6 @@ class ImagenGaleriaViewSet(viewsets.ModelViewSet):
         return queryset.order_by('orden')
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()  # Esto es necesario
+    queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [AllowAny]  # Totalmente público
