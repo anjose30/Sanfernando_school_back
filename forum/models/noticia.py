@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.conf import settings
 from .categoria import Categoria
 from ckeditor_uploader.fields import RichTextUploadingField
 
@@ -18,7 +18,7 @@ class Noticia(models.Model):
         related_name='noticias'
     )
     autor = models.ForeignKey(
-        User, 
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
         related_name='noticias'
     )

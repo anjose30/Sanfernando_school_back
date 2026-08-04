@@ -1,4 +1,5 @@
 # forum/views.py
+from django.contrib.auth import get_user_model
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -13,7 +14,6 @@ from .serializers.serializers import (
     ImagenGaleriaSerializer, UserSerializer
 )
 from .services.services import NoticiaService
-from django.contrib.auth.models import User
 
 class CategoriaViewSet(viewsets.ModelViewSet):
     queryset = Categoria.objects.all()
@@ -95,6 +95,6 @@ class ImagenGaleriaViewSet(viewsets.ModelViewSet):
         return queryset.order_by('orden')
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
+    queryset = get_user_model().objects.all()
     serializer_class = UserSerializer
     permission_classes = [AllowAny]  # Totalmente público

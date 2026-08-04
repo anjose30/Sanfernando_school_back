@@ -1,0 +1,209 @@
+ENDPOINTS DISPONIBLES DEL BACKEND
+================================
+Base URL sugerida para desarrollo:
+- http://127.0.0.1:8000
+
+Autenticación
+------------
+Todos los endpoints de recursos usan JWT. En el header Authorization enviar:
+- Authorization: Bearer <access_token>
+
+1) Iniciar sesión
+- POST /api/token/
+- Recibe:
+  {
+    "username": "usuario",
+    "password": "contraseña"
+  }
+- Responde:
+  {
+    "refresh": "<refresh_token>",
+    "access": "<access_token>"
+  }
+
+2) Renovar token
+- POST /api/token/refresh/
+- Recibe:
+  {
+    "refresh": "<refresh_token>"
+  }
+- Responde:
+  {
+    "access": "<nuevo_access_token>"
+  }
+
+ENDPOINTS DE FORO / API
+-----------------------
+Todos los listados (GET) usan paginación DRF por defecto:
+{
+  "count": 10,
+  "next": "http://127.0.0.1:8000/api/categorias/?page=2",
+  "previous": null,
+  "results": [ ... ]
+}
+
+1) Categorías
+- GET /api/categorias/
+  - Recibe: nada
+  - Responde: lista paginada de objetos como:
+    {
+      "id": 1,
+      "nombre": "Educación",
+      "descripcion": "Descripción",
+      "created_at": "2026-08-03T10:00:00Z"
+    }
+
+- POST /api/categorias/
+  - Recibe:
+    {
+      "nombre": "Educación",
+      "descripcion": "Descripción"
+    }
+  - Responde: el mismo objeto de categoría creado.
+
+- GET /api/categorias/<id>/
+  - Recibe: nada
+  - Responde: un objeto categoría.
+
+- PUT /api/categorias/<id>/
+- PATCH /api/categorias/<id>/
+  - Recibe: campos parciales o completos de la categoría.
+
+- DELETE /api/categorias/<id>/
+  - Recibe: nada
+  - Responde: 204 No Content.
+
+2) Noticias
+- GET /api/noticias/
+  - Recibe: nada
+  - Responde: lista paginada de noticias en formato corto:
+    {
+      "id": 1,
+      "titulo": "Título",
+      "resumen": "Texto resumen",
+      "imagen_destacada": "/media/noticias/portadas/imagen.jpg",
+      "categoria": 1,
+      "categoria_nombre": "Educación",
+      "autor_nombre": "admin",
+      "created_at": "2026-08-03T10:00:00Z",
+      "publicado": true,
+      "visitas": 0
+    }
+
+- POST /api/noticias/
+  - Recibe (multipart/form-data si hay archivo):
+    {
+      "titulo": "Título",
+      "contenido": "Contenido HTML o texto enriquecido",
+      "imagen_destacada": archivo (opcional),
+      "categoria": 1,
+      "publicado": true
+    }
+  - Responde: el objeto completo de la noticia creada.
+  - Nota: el autor se asigna automáticamente al usuario autenticado.
+
+- GET /api/noticias/<id>/
+  - Recibe: nada
+  - Responde:
+    {
+      "id": 1,
+      "titulo": "Título",
+      "contenido": "Texto completo",
+      "imagen_destacada": "/media/noticias/portadas/imagen.jpg",
+      "categoria": 1,
+      "categoria_nombre": "Educación",
+      "autor": 1,
+      "autor_nombre": "admin",
+      "created_at": "2026-08-03T10:00:00Z",
+      "updated_at": "2026-08-03T10:30:00Z",
+      "publicado": true,
+      "visitas": 0
+    }
+
+- PUT /api/noticias/<id>/
+- PATCH /api/noticias/<id>/
+  - Recibe: campos de la noticia.
+
+- DELETE /api/noticias/<id>/
+  - Recibe: nada
+  - Responde: 204 No Content.
+
+Acciones personalizadas de noticias
+- POST /api/noticias/<id>/incrementar_visitas/
+  - Recibe: nada
+  - Responde:
+    {
+      "visitas": 3
+    }
+
+- GET /api/noticias/recientes/?limit=5
+  - Recibe: query param `limit` opcional
+  - Responde: lista de noticias en formato corto.
+
+- GET /api/noticias/mas_vistas/?limit=5
+  - Recibe: query param `limit` opcional
+  - Responde: lista de noticias en formato corto.
+
+- GET /api/noticias/buscar/?q=palabra
+  - Recibe: query param `q`
+  - Responde: lista de noticias en formato corto.
+
+- GET /api/noticias/por_categoria/?categoria_id=1
+  - Recibe: query param `categoria_id`
+  - Responde: lista de noticias en formato corto.
+
+3) Categorías de galería
+- GET /api/galeria-categorias/
+- POST /api/galeria-categorias/
+- GET /api/galeria-categorias/<id>/
+- PUT /api/galeria-categorias/<id>/
+- PATCH /api/galeria-categorias/<id>/
+- DELETE /api/galeria-categorias/<id>/
+
+- Recibe/Responde:
+  {
+    "id": 1,
+    "nombre": "Exterior",
+    "descripcion": "Descripción",
+    "created_at": "2026-08-03T10:00:00Z"
+  }
+
+4) Imágenes de galería
+- GET /api/galeria-imagenes/
+- POST /api/galeria-imagenes/
+- GET /api/galeria-imagenes/<id>/
+- PUT /api/galeria-imagenes/<id>/
+- PATCH /api/galeria-imagenes/<id>/
+- DELETE /api/galeria-imagenes/<id>/
+
+- Recibe (multipart/form-data si hay archivo):
+  {
+    "categoria": 1,
+    "titulo": "Foto 1",
+    "descripcion": "Descripción",
+    "imagen": archivo,
+    "orden": 1,
+    "activo": true
+  }
+
+- Responde:
+  {
+    "id": 1,
+    "categoria": 1,
+    "categoria_nombre": "Exterior",
+    "titulo": "Foto 1",
+    "descripcion": "Descripción",
+    "imagen": "/media/galeria/imagen.jpg",
+    "created_at": "2026-08-03T10:00:00Z",
+    "orden": 1,
+    "activo": true
+  }
+
+- Nota: GET soporta filtro por categoría:
+  - GET /api/galeria-imagenes/?categoria_id=1
+
+Resumen rápido de permisos
+--------------------------
+- GET: público
+- POST/PUT/PATCH/DELETE en recursos principales: requieren autenticación JWT
+- Auth: registro/login/perfil con JWT

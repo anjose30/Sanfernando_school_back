@@ -1,10 +1,12 @@
 # forum/serializers/serializers.py
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from ..models.categoria import Categoria
 from ..models.noticia import Noticia
 from ..models.galeriaCategoria import GaleriaCategoria
 from ..models.imagenGaleria import ImagenGaleria
-from django.contrib.auth.models import User
+
+User = get_user_model()
 
 class CategoriaSerializer(serializers.ModelSerializer):
     class Meta:
